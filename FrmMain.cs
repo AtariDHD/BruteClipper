@@ -268,15 +268,15 @@ namespace BruteClipper
                 {
                     Thread.Sleep(1200); // TODO: need a better way of making sure user is still not holding down hotkey modifier keys
                     var keys = EscapeSendKeysSpecialCharacters(Clipboard.GetText(TextDataFormat.UnicodeText));
-                    //MessageBox.Show("UnicodeText: " + keys);
-                    SendKeys.Send(keys);
+                    System.Diagnostics.Debug.WriteLine("pasting unicode");
+                    SendKeys.SendWait(keys);
                 }
                 else if (Clipboard.ContainsText(TextDataFormat.Text))
                 {
                     Thread.Sleep(1200); // TODO: need a better way of making sure user is still not holding down hotkey modifier keys
                     var keys = EscapeSendKeysSpecialCharacters(Clipboard.GetText(TextDataFormat.Text));
-                    //MessageBox.Show("Text: " + keys);
-                    SendKeys.Send(keys);
+                    System.Diagnostics.Debug.WriteLine("pasting text");
+                    SendKeys.SendWait(keys);
                 }
                 else
                 {
@@ -291,8 +291,7 @@ namespace BruteClipper
             var reSendKeysChars = new Regex(@"(?<SpecialCharacter>[+^%~{}[\]])");
             var escaped = reSendKeysChars.Replace(str, m => m.Value.Replace(m.Groups["SpecialCharacter"].Value, $"{{{m.Groups["SpecialCharacter"].Value}}}"));
 
-            var reNewLines = new Regex(@"(\r\n|\r|\n)+");
-            escaped = reNewLines.Replace(escaped, @"{ENTER}");
+            escaped = escaped.Replace("\r\n", "\n");
 
             return escaped;
         }
