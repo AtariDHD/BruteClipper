@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BruteClipper", "BruteClipper.csproj", "{18215C6D-2A47-4EF5-BBD4-8D237DA30049}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{18215C6D-2A47-4EF5-BBD4-8D237DA30049}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18215C6D-2A47-4EF5-BBD4-8D237DA30049}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18215C6D-2A47-4EF5-BBD4-8D237DA30049}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18215C6D-2A47-4EF5-BBD4-8D237DA30049}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6DBB8E8D-91D0-447D-AFB6-A88A18259FA5}
+	EndGlobalSection
+EndGlobal
