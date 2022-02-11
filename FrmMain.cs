@@ -11,11 +11,11 @@ namespace BruteClipper
     /// <summary>
     /// Summary description for FrmMain.
     /// </summary>
-    public class FrmMain : System.Windows.Forms.Form
+    public class FrmMain : Form
 	{
-		private System.Windows.Forms.NumericUpDown NumMinMod;
-		private System.Windows.Forms.TextBox TxtKeyEnumValue;
-		private System.Windows.Forms.Button BtnChangeHotkey;
+		private NumericUpDown NumMinMod;
+		private TextBox TxtKeyEnumValue;
+		private Button BtnChangeHotkey;
         private NotifyIcon SystemTrayIcon;
         private System.ComponentModel.IContainer components;
 
@@ -118,7 +118,7 @@ namespace BruteClipper
                     if (success)
                         TxtKeyEnumValue.Text = val.ToString();
                     else
-                        MessageBox.Show("Could not register Hotkey - there is probably a conflict.  ", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Brute Clipper: Could not register hotkey. There is probably a conflict.  ", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -249,7 +249,7 @@ namespace BruteClipper
 					writer.Close();
 				}
 				else
-					MessageBox.Show("Brute Clipper: Could not register hotkey - there is probably a conflict.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					MessageBox.Show("Brute Clipper: Could not register hotkey. There is probably a conflict.  ", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
@@ -264,23 +264,16 @@ namespace BruteClipper
 		{
 			if (m.Msg == 0x0312)
             {
-                if (Clipboard.ContainsText(TextDataFormat.UnicodeText))
+                if (Clipboard.ContainsText(TextDataFormat.Text) || Clipboard.ContainsText(TextDataFormat.UnicodeText))
                 {
                     Thread.Sleep(1200); // TODO: need a better way of making sure user is still not holding down hotkey modifier keys
-                    var keys = EscapeSendKeysSpecialCharacters(Clipboard.GetText(TextDataFormat.UnicodeText));
-                    System.Diagnostics.Debug.WriteLine("pasting unicode");
-                    SendKeys.SendWait(keys);
-                }
-                else if (Clipboard.ContainsText(TextDataFormat.Text))
-                {
-                    Thread.Sleep(1200); // TODO: need a better way of making sure user is still not holding down hotkey modifier keys
-                    var keys = EscapeSendKeysSpecialCharacters(Clipboard.GetText(TextDataFormat.Text));
-                    System.Diagnostics.Debug.WriteLine("pasting text");
+                    var keys = EscapeSendKeysSpecialCharacters(Clipboard.GetText());
+                    System.Diagnostics.Debug.WriteLine("BruteClipper: Hotkey called. Pasting text.");
                     SendKeys.SendWait(keys);
                 }
                 else
                 {
-                    //MessageBox.Show("No clipboard Text or UnicodeText");
+                    System.Diagnostics.Debug.WriteLine("BruteClipper: Hotkey called, but no text in clipboard to paste.");
                 }
             }
             base.WndProc(ref m);
@@ -291,7 +284,7 @@ namespace BruteClipper
             var reSendKeysChars = new Regex(@"(?<SpecialCharacter>[+^%~{}[\]])");
             var escaped = reSendKeysChars.Replace(str, m => m.Value.Replace(m.Groups["SpecialCharacter"].Value, $"{{{m.Groups["SpecialCharacter"].Value}}}"));
 
-            escaped = escaped.Replace("\r\n", "\n");
+            escaped = escaped.Replace("\r\n", "~");
 
             return escaped;
         }
