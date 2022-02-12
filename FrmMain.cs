@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using Tesseract;
 
 namespace BruteClipper
 {
@@ -182,8 +184,9 @@ namespace BruteClipper
                 if (m.WParam.ToInt32() == COPY_HOTKEY_ID)
                 {
                     SystemTrayIcon.ShowBalloonTip(2000, "Brute Clipper", "Copy OCR Started", ToolTipIcon.Info);
-
-                    Clipboard.SetImage(screenCapturer.Capture());
+                    var activeWindowScreenGrab = screenCapturer.Capture();
+                    //Clipboard.SetImage(activeWindowScreenGrab);
+                    BitmapOcrToClipboard(activeWindowScreenGrab);
                 }
                 else if (m.WParam.ToInt32() == PASTE_HOTKEY_ID)
                 {
@@ -191,29 +194,53 @@ namespace BruteClipper
                     {
                         Thread.Sleep(1200); // TODO: need a better way of making sure user is still not holding down hotkey modifier keys
                         var keys = EscapeSendKeysSpecialCharacters(Clipboard.GetText());
-                        System.Diagnostics.Debug.WriteLine("Brute Clipper: Hotkey called. Pasting text.");
+                        Debug.WriteLine("Brute Clipper: Hotkey called. Pasting text.");
                         SendKeys.SendWait(keys);
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("Brute Clipper: Hotkey called, but no text in clipboard to paste.");
+                        Debug.WriteLine("Brute Clipper: Hotkey called, but no text in clipboard to paste.");
                     }
                 }
             }
             base.WndProc(ref m);
         }
 
-        private Bitmap GetScreenshot()
+        private string BitmapOcrToClipboard(Bitmap image)
         {
-            Bitmap bm = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-            Graphics g = Graphics.FromImage(bm);
-            g.CopyFromScreen(0, 0, 0, 0, bm.Size);
-            return bm;
+            try
+            {
+                using (var engine = new TesseractEngine(@"./Resources/tessdata", "eng", EngineMode.Default))
+                {
+                    var bmpToPix = new Tesseract.BitmapToPixConverter();
+
+                    using (var img = bmpToPix.Convert(image))
+                    {
+                        using (var page = engine.Process(img))
+                        {
+                            var text = page.GetText();
+
+                            Debug.WriteLine("Mean confidence: {0}", page.GetMeanConfidence());
+                            //Debug.WriteLine(text);
+                            Clipboard.SetText(text);
+                            return text;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(e.ToString());
+                Debug.WriteLine("Unexpected Error: " + e.Message);
+                Debug.WriteLine("Details: ");
+                Debug.WriteLine(e.ToString());
+                return null;
+            }
         }
 
         private string EscapeSendKeysSpecialCharacters(string str)
         {
-            var reSendKeysChars = new Regex(@"(?<SpecialCharacter>[+^%~{}[\]])");
+            var reSendKeysChars = new Regex(@"(?<SpecialCharacter>[+^%~{}[\]\(\)])");
             var escaped = reSendKeysChars.Replace(str, m => m.Value.Replace(m.Groups["SpecialCharacter"].Value, $"{{{m.Groups["SpecialCharacter"].Value}}}"));
             escaped = escaped.Replace("\r\n", "~");
 
@@ -265,7 +292,6 @@ namespace BruteClipper
                 if (screenCaptureMode == ScreenCaptureMode.Screen)
                 {
                     bounds = Screen.GetBounds(Point.Empty);
-                    CursorPosition = Cursor.Position;
                 }
                 else
                 {
@@ -273,7 +299,6 @@ namespace BruteClipper
                     var rect = new Rect();
                     GetWindowRect(foregroundWindowsHandle, ref rect);
                     bounds = new Rectangle(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
-                    CursorPosition = new Point(Cursor.Position.X - rect.Left, Cursor.Position.Y - rect.Top);
                 }
 
                 var result = new Bitmap(bounds.Width, bounds.Height);
@@ -284,12 +309,6 @@ namespace BruteClipper
                 }
 
                 return result;
-            }
-
-            public Point CursorPosition
-            {
-                get;
-                protected set;
             }
         }
 
