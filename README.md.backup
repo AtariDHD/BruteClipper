@@ -1,6 +1,6 @@
 # BruteClipper
 
-Windows utility to paste text into apps with clipboard functions disabled. Copy functionality is in development and will take a screenshot and then OCR the
+Windows utility to paste text into apps with clipboard functions disabled. Copy functionality is in development and will take a screenshot and then OCR the text, once it's working.
 
 ## Usage
 1. Open the BruteClipper.sln solution in Visual Studio. It contains a C# Winforms project. Either debug the project or build and run the executable in bin/debug.
@@ -16,3 +16,5 @@ Windows utility to paste text into apps with clipboard functions disabled. Copy 
 11. If you need to close BruteClipper, right-click on the tray icon and choose Exit.
 
 **Note:** The next time you launch the application, it should recall the hotkey you last configured.
+
+**Note:** If the application you are attempting to copy/paste was launched in Administrator mode, you must also launch Brute Clipper in Administrator mode.
