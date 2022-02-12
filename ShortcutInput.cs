@@ -1,15 +1,10 @@
-using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
 using System.Windows.Forms;
 
 
 namespace BruteClipper
 {
 
-	public class ShortcutInput : System.Windows.Forms.UserControl
+    public class ShortcutInput : System.Windows.Forms.UserControl
 	{
 		#region Public Properties
 		public byte CharCode 
@@ -115,10 +110,10 @@ namespace BruteClipper
 
 
 		private const byte ModAlt = 1, ModControl = 2, ModShift = 4, ModWin = 8;
-		private System.Windows.Forms.CheckBox CbxShift;
-		private System.Windows.Forms.CheckBox CbxControl;
-		private System.Windows.Forms.CheckBox CbxAlt;
-		private System.Windows.Forms.ComboBox DdnChars;
+		private CheckBox CbxShift;
+		private CheckBox CbxControl;
+		private CheckBox CbxAlt;
+		private ComboBox DdnChars;
 		/// <summary> 
 		/// Required designer variable.
 		/// </summary>

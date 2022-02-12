@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BruteClipper.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="PasteHotkey" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">393302</Value>
+    </Setting>
+    <Setting Name="CopyHotkey" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">393283</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
