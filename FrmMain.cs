@@ -32,8 +32,10 @@ namespace BruteClipper
         private Button BtnChangePasteHotkey;
         private NotifyIcon SystemTrayIcon;
         private System.ComponentModel.IContainer components;
-
+        private Button button1;
         private bool allowVisible; // ContextMenu's Open command used
+
+        public static Rectangle SelectRegionResult;
 
         /// <summary>
         /// The main entry point for the application.
@@ -183,10 +185,20 @@ namespace BruteClipper
             {
                 if (m.WParam.ToInt32() == COPY_HOTKEY_ID)
                 {
-                    SystemTrayIcon.ShowBalloonTip(2000, "Brute Clipper", "Copy OCR Started", ToolTipIcon.Info);
-                    var activeWindowScreenGrab = screenCapturer.Capture();
-                    //Clipboard.SetImage(activeWindowScreenGrab);
-                    BitmapOcrToClipboard(activeWindowScreenGrab);
+                    //SystemTrayIcon.ShowBalloonTip(1000, "Brute Clipper", "Copy OCR Started", ToolTipIcon.Info);
+
+                    SelectRegion frm = new SelectRegion(screenCapturer.GetForegroundWindowBounds());
+                    if (frm.ShowDialog() == DialogResult.OK)
+                    {
+                        System.Diagnostics.Debug.WriteLine("select region dialog ok + " + SelectRegionResult.Left.ToString() + ", " + SelectRegionResult.Right.ToString() + ", " + SelectRegionResult.Width.ToString() + ", " + SelectRegionResult.Height.ToString());
+                        var activeWindowScreenGrab = screenCapturer.Capture(ScreenCaptureMode.Specified, SelectRegionResult);
+                        //Clipboard.SetImage(activeWindowScreenGrab);
+                        BitmapOcrToClipboard(activeWindowScreenGrab);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("select region dialog cancel");
+                    }
                 }
                 else if (m.WParam.ToInt32() == PASTE_HOTKEY_ID)
                 {
@@ -265,7 +277,8 @@ namespace BruteClipper
         public enum ScreenCaptureMode
         {
             Screen,
-            Window
+            Window,
+            Specified
         }
 
         class ScreenCapturer
@@ -285,20 +298,33 @@ namespace BruteClipper
                 public int Bottom;
             }
 
-            public Bitmap Capture(ScreenCaptureMode screenCaptureMode = ScreenCaptureMode.Window)
-            {
-                Rectangle bounds;
+            const int DWMWA_EXTENDED_FRAME_BOUNDS = 9;
 
+            [DllImport("dwmapi.dll")]
+            static extern int DwmGetWindowAttribute(IntPtr hwnd, int dwAttribute, out Rect pvAttribute, int cbAttribute);
+
+            public Rectangle GetForegroundWindowBounds()
+            {
+                var foregroundWindowsHandle = GetForegroundWindow();
+                var rect = new Rect();
+
+                if (DwmGetWindowAttribute(foregroundWindowsHandle, DWMWA_EXTENDED_FRAME_BOUNDS, out rect, Marshal.SizeOf(typeof(Rect))) != 0)
+                {
+                    GetWindowRect(foregroundWindowsHandle, ref rect);
+                }
+
+                return new Rectangle(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
+            }
+
+            public Bitmap Capture(ScreenCaptureMode screenCaptureMode = ScreenCaptureMode.Window, Rectangle bounds = new Rectangle())
+            {
                 if (screenCaptureMode == ScreenCaptureMode.Screen)
                 {
                     bounds = Screen.GetBounds(Point.Empty);
                 }
-                else
+                else if (screenCaptureMode != ScreenCaptureMode.Specified)
                 {
-                    var foregroundWindowsHandle = GetForegroundWindow();
-                    var rect = new Rect();
-                    GetWindowRect(foregroundWindowsHandle, ref rect);
-                    bounds = new Rectangle(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
+                    bounds = GetForegroundWindowBounds();
                 }
 
                 var result = new Bitmap(bounds.Width, bounds.Height);
@@ -323,6 +349,7 @@ namespace BruteClipper
             this.BtnChangePasteHotkey = new System.Windows.Forms.Button();
             this.SystemTrayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.BtnChangeCopyHotkey = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // BtnChangePasteHotkey
@@ -353,10 +380,21 @@ namespace BruteClipper
             this.BtnChangeCopyHotkey.Text = "Change Copy Hotkey";
             this.BtnChangeCopyHotkey.Click += new System.EventHandler(this.BtnChangeCopyHotkey_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(89, 151);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // FrmMain
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(6, 15);
             this.ClientSize = new System.Drawing.Size(314, 186);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.BtnChangeCopyHotkey);
             this.Controls.Add(this.BtnChangePasteHotkey);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -369,5 +407,11 @@ namespace BruteClipper
 
         }
         #endregion
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //SelectRegion frm = new SelectRegion();
+            //frm.ShowDialog();
+        }
     }
 }

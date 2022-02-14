@@ -102,6 +102,7 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
+    <Reference Include="System.Xaml" />
     <Reference Include="System.XML">
       <Name>System.XML</Name>
     </Reference>
@@ -127,6 +128,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="SelectRegion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectRegion.Designer.cs">
+      <DependentUpon>SelectRegion.cs</DependentUpon>
+    </Compile>
     <Compile Include="ShortcutInput.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -141,6 +148,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectRegion.resx">
+      <DependentUpon>SelectRegion.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ShortcutInput.resx">
       <DependentUpon>ShortcutInput.cs</DependentUpon>
